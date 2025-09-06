@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener App</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background-color: #f0f0f0;
+        }
+
+        .tab.active {
+            color: #1976d2;
+            border-bottom: 3px solid #1976d2;
+        }
+
+        .url-form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+
+        button {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .add-button {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+        }
+
+        .delete-button {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 15px;
+        }
+
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            border-left: 4px solid #d32f2f;
+        }
+
+        .success {
+            background-color: #e8f5e9;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .url-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .url-card h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stats-table th, .stats-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .stats-table th {
+            background-color: #f5f5f5;
+            font-weight: 500;
+        }
+
+        .stats-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .stats-table tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .click-count {
+            display: inline-block;
+            background: #1976d2;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                padding: 12px 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .stats-table {
+                font-size: 14px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>URL Shortener</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(0)">URL Shortener</div>
+            <div class="tab" onclick="switchTab(1)">Statistics</div>
+        </div>
+
+        <div id="shortener-tab">
+            <div id="url-forms">
+                <div class="url-form fade-in">
+                    <div class="form-group">
+                        <label for="url0">Long URL</label>
+                        <input type="text" id="url0" placeholder="https://example.com/very-long-url" oninput="clearError(0)">
+                    </div>
+                    <div class="form-group">
+                        <label for="validity0">Validity (minutes, default: 30)</label>
+                        <input type="number" id="validity0" placeholder="30" min="1" oninput="clearError(0)">
+                    </div>
+                    <div class="form-group">
+                        <label for="shortcode0">Custom Shortcode (optional)</label>
+                        <input type="text" id="shortcode0" placeholder="my-custom-link" oninput="clearError(0)">
+                    </div>
+                    <button onclick="shortenUrl(0)">Shorten URL</button>
+                    <div id="result0"></div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="add-button" onclick="addUrlField()">Add Another URL</button>
+                <button onclick="shortenAllUrls()">Shorten All URLs</button>
+            </div>
+        </div>
+
+        <div id="statistics-tab" class="hidden">
+            <div id="stats-content">
+                <div class="url-form">
+                    <h2>URL Statistics</h2>
+                    <p>No shortened URLs available. Create some URLs to see statistics here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logging middleware
+        class LoggingMiddleware {
+            constructor() {
+                this.logs = [];
+            }
+
+            log(level, message, data = {}) {
+                const timestamp = new Date().toISOString();
+                const logEntry = { timestamp, level, message, data };
+                this.logs.push(logEntry);
+                console.log(`[${timestamp}] [${level}] ${message}`, data);
+            }
+
+            info(message, data = {}) {
+                this.log('INFO', message, data);
+            }
+
+            warn(message, data = {}) {
+                this.log('WARN', message, data);
+            }
+
+            error(message, data = {}) {
+                this.log('ERROR', message, data);
+            }
+        }
+
+        const loggingMiddleware = new LoggingMiddleware();
+
+        // URL service
+        class UrlService {
+            constructor() {
+                this.urlMappings = new Map();
+                this.clickData = new Map();
+                this.nextId = 1;
+            }
+
+            generateShortCode() {
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                for (let i = 0; i < 6; i++) {
+                    result += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                return result;
+            }
+
+            shortenUrl(longUrl, validityMinutes = 30, customShortCode = null) {
+                loggingMiddleware.info('Shortening URL request received', { longUrl, validityMinutes, customShortCode });
+                
+                // Validate URL format
+                try {
+                    // Add http:// if missing
+                    if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
+                        longUrl = 'https://' + longUrl;
+                    }
+                    new URL(longUrl);
+                } catch (e) {
+                    loggingMiddleware.error('Invalid URL format', { longUrl });
+                    throw new Error('Please enter a valid URL');
+                }
+                
+                // Validate validity minutes
+                validityMinutes = parseInt(validityMinutes) || 30;
+                if (validityMinutes <= 0) {
+                    loggingMiddleware.error('Invalid validity minutes', { validityMinutes });
+                    throw new Error('Validity must be a positive number');
+                }
+                
+                // Check if custom shortcode is provided and valid
+                let shortCode;
+                if (customShortCode && customShortCode.trim() !== '') {
+                    customShortCode = customShortCode.trim();
+                    if (!/^[a-zA-Z0-9_-]{4,}$/.test(customShortCode)) {
+                        loggingMiddleware.error('Invalid custom shortcode format', { customShortCode });
+                        throw new Error('Shortcode must be at least 4 characters and contain only letters, numbers, hyphens, and underscores');
+                    }
+                    
+                    if (this.urlMappings.has(customShortCode)) {
+                        loggingMiddleware.error('Shortcode already exists', { customShortCode });
+                        throw new Error('This shortcode is already in use. Please choose another one.');
+                    }
+                    shortCode = customShortCode;
+                } else {
+                    // Generate a unique shortcode
+                    do {
+                        shortCode = this.generateShortCode();
+                    } while (this.urlMappings.has(shortCode));
+                }
+                
+                const createdAt = new Date();
+                const expiresAt = new Date(createdAt.getTime() + (validityMinutes * 60000));
+                
+                const urlData = {
+                    id: this.nextId++,
+                    longUrl,
+                    shortCode,
+                    createdAt,
+                    expiresAt,
+                    clicks: 0
+                };
+                
+                this.urlMappings.set(shortCode, urlData);
+                this.clickData.set(shortCode, []);
+                
+                loggingMiddleware.info('URL shortened successfully', { shortCode, urlData });
+                
+                return {
+                    shortUrl: `${window.location.origin}/${shortCode}`,
+                    ...urlData
+                };
+            }
+            
+            getUrl(shortCode) {
+                loggingMiddleware.info('Retrieving URL', { shortCode });
+                
+                const urlData = this.urlMappings.get(shortCode);
+                if (!urlData) {
+                    loggingMiddleware.error('Shortcode not found', { shortCode });
+                    throw new Error('URL not found');
+                }
+                
+                // Check if URL has expired
+                if (new Date() > urlData.expiresAt) {
+                    loggingMiddleware.error('URL has expired', { shortCode, expiresAt: urlData.expiresAt });
+                    throw new Error('This URL has expired');
+                }
+                
+                // Record click
+                urlData.clicks += 1;
+                const clickInfo = {
+                    timestamp: new Date(),
+                    source: navigator.userAgent,
+                    location: this.getCoarseLocation()
+                };
+                
+                this.clickData.get(shortCode).push(clickInfo);
+                loggingMiddleware.info('URL accessed', { shortCode, clickInfo });
+                
+                return urlData;
+            }
+            
+            getStatistics() {
+                loggingMiddleware.info('Retrieving statistics');
+                
+                const stats = [];
+                for (const [shortCode, urlData] of this.urlMappings.entries()) {
+                    stats.push({
+                        ...urlData,
+                        shortUrl: `${window.location.origin}/${shortCode}`,
+                        clicksData: this.clickData.get(shortCode) || []
+                    });
+                }
+                
+                return stats;
+            }
+            
+            getCoarseLocation() {
+                const locations = ['North America', 'Europe', 'Asia', 'South America', 'Africa', 'Oceania'];
+                return locations[Math.floor(Math.random() * locations.length)];
+            }
+        }
+
+        const urlService = new UrlService();
+        let urlCount = 1;
+
+        function switchTab(tabIndex) {
+            document.querySelectorAll('.tab').forEach((tab, index) => {
+                if (index === tabIndex) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            if (tabIndex === 0) {
+                document.getElementById('shortener-tab').classList.remove('hidden');
+                document.getElementById('statistics-tab').classList.add('hidden');
+            } else {
+                document.getElementById('shortener-tab').classList.add('hidden');
+                document.getElementById('statistics-tab').classList.remove('hidden');
+                displayStatistics();
+            }
+        }
+
+        function addUrlField() {
+            if (urlCount >= 5) {
+                alert('Maximum of 5 URLs allowed');
+                return;
+            }
+
+            const formsContainer = document.getElementById('url-forms');
+            const newForm = document.createElement('div');
+            newForm.className = 'url-form fade-in';
+            newForm.innerHTML = `
+                <div class="form-group">
+                    <label for="url${urlCount}">Long URL</label>
+                    <input type="text" id="url${urlCount}" placeholder="https://example.com/very-long-url" oninput="clearError(${urlCount})">
+                </div>
+                <div class="form-group">
+                    <label for="validity${urlCount}">Validity (minutes, default: 30)</label>
+                    <input type="number" id="validity${urlCount}" placeholder="30" min="1" oninput="clearError(${urlCount})">
+                </div>
+                <div class="form-group">
+                    <label for="shortcode${urlCount}">Custom Shortcode (optional)</label>
+                    <input type="text" id="shortcode${urlCount}" placeholder="my-custom-link" oninput="clearError(${urlCount})">
+                </div>
+                <button onclick="shortenUrl(${urlCount})">Shorten URL</button>
+                <button class="delete-button" onclick="deleteUrlField(${urlCount})">Delete</button>
+                <div id="result${urlCount}"></div>
+            `;
+            formsContainer.appendChild(newForm);
+            urlCount++;
+        }
+
+        function clearError(index) {
+            const resultDiv = document.getElementById(`result${index}`);
+            if (resultDiv) {
+                resultDiv.innerHTML = '';
+            }
+        }
+
+        function deleteUrlField(index) {
+            const formToDelete = document.querySelector(`#url-forms > div:nth-child(${index + 1})`);
+            if (formToDelete) {
+                formToDelete.remove();
+                // Reindex remaining forms
+                const forms = document.querySelectorAll('#url-forms > div');
+                forms.forEach((form, i) => {
+                    const button = form.querySelector('button');
+                    const deleteBtn = form.querySelector('.delete-button');
+                    if (button) button.setAttribute('onclick', `shortenUrl(${i})`);
+                    if (deleteBtn) deleteBtn.setAttribute('onclick', `deleteUrlField(${i})`);
+                    
+                    // Update input IDs
+                    const inputs = form.querySelectorAll('input');
+                    if (inputs[0]) {
+                        inputs[0].id = `url${i}`;
+                        inputs[0].setAttribute('oninput', `clearError(${i})`);
+                    }
+                    if (inputs[1]) {
+                        inputs[1].id = `validity${i}`;
+                        inputs[1].setAttribute('oninput', `clearError(${i})`);
+                    }
+                    if (inputs[2]) {
+                        inputs[2].id = `shortcode${i}`;
+                        inputs[2].setAttribute('oninput', `clearError(${i})`);
+                    }
+                    
+                    // Update result div ID
+                    const resultDiv = form.querySelector('div[id^="result"]');
+                    if (resultDiv) resultDiv.id = `result${i}`;
+                });
+                urlCount = forms.length;
+            }
+        }
+
+        function shortenUrl(index) {
+            const longUrlInput = document.getElementById(`url${index}`);
+            const validityInput = document.getElementById(`validity${index}`);
+            const shortcodeInput = document.getElementById(`shortcode${index}`);
+            const resultDiv = document.getElementById(`result${index}`);
+
+            if (!longUrlInput || !resultDiv) return;
+
+            const longUrl = longUrlInput.value.trim();
+            const validity = validityInput ? validityInput.value : '';
+            const shortcode = shortcodeInput ? shortcodeInput.value.trim() : '';
+
+            if (!longUrl) {
+                resultDiv.innerHTML = `<div class="error">Please enter a URL</div>`;
+                return;
+            }
+
+            try {
+                const result = urlService.shortenUrl(
+                    longUrl,
+                    validity ? parseInt(validity) : 30,
+                    shortcode || null
+                );
+
+                resultDiv.innerHTML = `
+                    <div class="success fade-in">
+                        <h3>✅ Short URL Created!</h3>
+                        <p><strong>Short URL:</strong> <a href="${result.shortUrl}" target="_blank">${result.shortUrl}</a></p>
+                        <p><strong>Original URL:</strong> ${result.longUrl}</p>
+                        <p><strong>Expires:</strong> ${result.expiresAt.toLocaleString()}</p>
+                        <p><strong>Shortcode:</strong> ${result.shortCode}</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error fade-in">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function shortenAllUrls() {
+            for (let i = 0; i < urlCount; i++) {
+                if (document.getElementById(`url${i}`)) {
+                    shortenUrl(i);
+                }
+            }
+        }
+
+        function displayStatistics() {
+            const statsContent = document.getElementById('stats-content');
+            const stats = urlService.getStatistics();
+
+            if (stats.length === 0) {
+                statsContent.innerHTML = `
+                    <div class="url-form">
+                        <h2>URL Statistics</h2>
+                        <p>No shortened URLs available. Create some URLs to see statistics here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            stats.forEach(url => {
+                html += `
+                    <div class="url-card fade-in">
+                        <h3>${url.shortUrl} <span class="click-count">${url.clicks} clicks</span></h3>
+                        <p><strong>Original URL:</strong> ${url.longUrl}</p>
+                        <p><strong>Created:</strong> ${url.createdAt.toLocaleString()}</p>
+                        <p><strong>Expires:</strong> ${url.expiresAt.toLocaleString()}</p>
+                        <p><strong>Shortcode:</strong> ${url.shortCode}</p>
+                        
+                        ${url.clicks > 0 ? `
+                            <h4 style="margin-top: 20px;">Click Analytics</h4>
+                            <table class="stats-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Location</th>
+                                        <th>Source</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${url.clicksData.map(click => `
+                                        <tr>
+                                            <td>${click.timestamp.toLocaleString()}</td>
+                                            <td>${click.location}</td>
+                                            <td>${click.source.substring(0, 50)}...</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        ` : '<p>No clicks yet for this URL.</p>'}
+                    </div>
+                `;
+            });
+
+            statsContent.innerHTML = html;
+        }
+
+        // Handle URL redirection if a shortcode is in the URL
+        function handleRedirection() {
+            const path = window.location.pathname.substring(1); // Remove leading slash
+            if (path && path !== '') {
+                // This is a short URL access
+                try {
+                    const urlData = urlService.getUrl(path);
+                    alert(`Redirecting to: ${urlData.longUrl}\n\nThis is a demo. In a real application, you would be redirected automatically.`);
+                    // In a real app: window.location.href = urlData.longUrl;
+                } catch (error) {
+                    alert(`Error: ${error.message}`);
+                }
+            }
+        }
+
+        // Initialize the app
+        loggingMiddleware.info('URL Shortener application initialized');
+        handleRedirection();
+    </script>
+</body>
+</html>

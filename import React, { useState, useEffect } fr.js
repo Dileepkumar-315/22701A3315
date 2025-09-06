@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useParams, Link } from "react-router-dom";
 
-/* ------------------ Logger (mandatory) ------------------ */
+/*Logger (mandatory)*/
 class Logger {
   constructor(ns = "URLShortener") {
     this.ns = ns;
@@ -31,7 +31,7 @@ class Logger {
 }
 const logger = new Logger();
 
-/* ------------------ Shortcode generator ------------------ */
+/*Shortcode generator */
 const ALPH = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 function randomShort(len = 6) {
   const arr = new Uint8Array(len);
@@ -46,7 +46,7 @@ function generateUnique(getKeys, len = 6, tries = 50) {
   return randomShort(len + 2);
 }
 
-/* ------------------ Storage (localStorage + logger) ------------------ */
+/*Storage (localStorage + logger)*/
 const STORE_KEY = "url_mappings_v1";
 function readStore() {
   return JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
@@ -85,14 +85,14 @@ function listMappings() {
   return readStore();
 }
 
-/* ------------------ Utils ------------------ */
+/* Utils*/
 function isExpired(mapping) {
   if (!mapping) return true;
   const elapsed = (Date.now() - mapping.createdAt) / (60 * 1000);
   return elapsed > (mapping.validMinutes ?? 30);
 }
 
-/* ------------------ Components ------------------ */
+/*Components*/
 function ShortenForm() {
   const [url, setUrl] = useState("");
   const [custom, setCustom] = useState("");
@@ -222,7 +222,7 @@ function LogViewer() {
   );
 }
 
-/* ------------------ App Root ------------------ */
+/*App Root*/
 export default function App() {
   return (
     <BrowserRouter>
@@ -241,3 +241,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
